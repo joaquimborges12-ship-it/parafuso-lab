@@ -279,6 +279,12 @@
   .ip-ces .go2{min-height:60px; margin-top:8px; border:1px solid var(--rm-border); background:var(--rm-bg); color:var(--rm-text); font-size:17px; font-weight:800; font-family:inherit}
   .ip-ces .go:disabled, .ip-ces .go2:disabled{opacity:.45; cursor:default}
   /* iPad: modo balcão */
+  .pf-pin{width:340px} .pf-pin-tx{padding:4px 20px 0; font-size:14px; color:var(--rm-text-dim); text-align:center}
+  .pf-pin-dots{display:flex; justify-content:center; gap:16px; padding:16px 0}
+  .pf-pin-dots i{display:block; width:18px; height:18px; border-radius:50% !important; border:2px solid #1f2937} .pf-pin-dots i.on{background:#1f2937}
+  .pf-pin-k{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:0 20px 20px}
+  .pf-pin-k button{height:64px; font:inherit; font-size:26px; font-weight:800; border:1px solid var(--rm-border); background:var(--rm-bg); color:var(--rm-text); cursor:pointer; touch-action:manipulation; -webkit-user-select:none; user-select:none}
+  .pf-pin-k button:active{background:#1f2937; color:#fff} .pf-pin-k button.c{font-size:15px; font-weight:700}
   /* venda casada · parecidos · identificar · catálogo clientes */
   .pf-cmb{margin-top:14px; border:2px solid #2e8b57; background:#f1faf4; padding:10px 12px}
   .pf-cmb-t{font-weight:900; font-size:16px; margin-bottom:8px} .pf-cmb-t small{display:block; font-weight:600; font-size:12.5px; color:var(--rm-text-dim)}
@@ -4145,17 +4151,45 @@ window.addEventListener('online', () => rmPfFotosPreparar());
 const RM_PF_BALCAO_KEY = 'radicalMotos_pfBalcao', RM_PF_BALCAO_SUBS = ['vender', 'expositor', 'catalogo', 'nocoes'];
 function rmPfBalcaoLigado(){ try{ return !!localStorage.getItem(RM_PF_BALCAO_KEY); }catch(e){ return false; } }
 function rmPfBalcaoAplicar(){ document.body.classList.toggle('pf-balcao', rmPfBalcaoLigado()); }
+// teclado de senha só com números (no iPad não abre o teclado do sistema)
+function rmPfSenhaPad(o){
+  return new Promise(res => {
+    let v = '';
+    const ov = document.createElement('div'); ov.className = 'dg-ov';
+    ov.innerHTML = `<div class="dg dg-info pf-pin" role="dialog" aria-modal="true">
+      <div class="dg-cab"><div class="dg-ic">&#128274;</div><div class="dg-cabtx"><div class="dg-tit">${rmEscapeHtml(o.titulo || 'Senha')}</div></div></div>
+      <div class="pf-pin-tx">${rmEscapeHtml(o.texto || '').replace(/\n/g, '<br>')}</div>
+      <div class="pf-pin-dots"><i></i><i></i><i></i><i></i></div>
+      <div class="pf-pin-k">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button type="button" data-k="${n}">${n}</button>`).join('')}<button type="button" data-k="x" class="c">Cancelar</button><button type="button" data-k="0">0</button><button type="button" data-k="b" class="c">&#9003;</button></div>
+    </div>`;
+    const fim = r => { document.removeEventListener('keydown', tecla, true); ov.remove(); res(r); };
+    const pinta = () => ov.querySelectorAll('.pf-pin-dots i').forEach((d, i) => d.classList.toggle('on', i < v.length));
+    const aperta = k => {
+      if(k === 'x') return fim(null);
+      if(k === 'b'){ v = v.slice(0, -1); pinta(); return; }
+      if(v.length >= 4) return;
+      v += k; pinta();
+      if(v.length === 4) setTimeout(() => fim(v), 160);
+    };
+    const tecla = e => { if(/^[0-9]$/.test(e.key)) aperta(e.key); else if(e.key === 'Backspace') aperta('b'); else if(e.key === 'Escape') aperta('x'); else return; e.preventDefault(); e.stopPropagation(); };
+    ov.addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if(b) aperta(b.dataset.k); });
+    document.addEventListener('keydown', tecla, true);
+    document.body.appendChild(ov);
+  });
+}
 async function rmPfBalcaoLigar(){
-  const s = await rmPerguntar('Crie uma senha de 4 números.\nEla vai ser pedida para SAIR do modo balcão.', { titulo: 'Ligar modo balcão neste aparelho', numero: true, placeholder: '4 números', sim: 'Ligar' });
+  const s = await rmPfSenhaPad({ titulo: 'Ligar modo balcão neste aparelho', texto: 'Crie uma senha de 4 números.\nEla vai ser pedida para SAIR do modo balcão.' });
   if(s == null) return;
-  if(!/^\d{4}$/.test(String(s).trim())){ rmAlerta('A senha precisa ter exatamente 4 números.'); return; }
+  const s2 = await rmPfSenhaPad({ titulo: 'Confirme a senha', texto: 'Digite a mesma senha de novo.' });
+  if(s2 == null) return;
+  if(s2 !== s){ rmAlerta('As senhas não são iguais. Tente de novo.', { tipo: 'perigo', titulo: 'Não ligou' }); return; }
   localStorage.setItem(RM_PF_BALCAO_KEY, JSON.stringify({ senha: String(s).trim() }));
   rmLog('Ligou modo balcão', '', '');
   rmPfBalcaoAplicar(); rmSetViewPf('vender'); rmShowToast('Modo balcão ligado');
 }
 async function rmPfBalcaoSair(){
   let cfg = {}; try{ cfg = JSON.parse(localStorage.getItem(RM_PF_BALCAO_KEY)) || {}; }catch(e){}
-  const s = await rmPerguntar('Digite a senha do modo balcão.', { titulo: 'Sair do modo balcão', numero: true, sim: 'Sair' });
+  const s = await rmPfSenhaPad({ titulo: 'Sair do modo balcão', texto: 'Digite a senha do modo balcão.' });
   if(s == null) return;
   if(String(s).trim() !== String(cfg.senha || '')){ rmAlerta('Senha errada.', { tipo: 'perigo', titulo: 'Não saiu' }); return; }
   localStorage.removeItem(RM_PF_BALCAO_KEY); rmLog('Desligou modo balcão', '', '');
