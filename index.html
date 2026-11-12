@@ -402,19 +402,19 @@
   .pf-exp-tabs{display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap}
   .pf-exp-tabs button{padding:9px 14px; border:1px solid var(--rm-border); font-weight:700; font-size:14px; background:var(--rm-panel); color:var(--rm-text); font-family:inherit; cursor:pointer}
   .pf-exp-tabs button.on{background:var(--rm-text); color:var(--rm-panel); border-color:var(--rm-text)}
-  .pf-exp{display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:6px; background:#3a3a3a; padding:10px}
+  .pf-exp{display:grid; grid-template-columns:repeat(10,minmax(0,1fr)); gap:6px; background:#d9dcdf; padding:10px; border:1px solid #c4c8cc}
   .pf-star{display:inline-block; font-style:normal; font-size:10.5px; font-weight:900; letter-spacing:.3px; color:#1c1300; background:#f5b301; padding:2px 6px; border-radius:3px; line-height:1.3}
   .pf-bx.pf-dest{background:#fff6d6; box-shadow:inset 0 0 0 2px #f5b301}
   .pf-cl > div.pf-dest{background:#fff6d6} .pf-cl > div.pf-dest span{display:flex; flex-direction:column; align-items:flex-start; gap:3px}
   .ipt button.pf-dest{background:#fff6d6; border:2px solid #f5b301; order:-1} .ipt button.pf-dest .pf-star{align-self:stretch; text-align:center}
-  .pf-bx{background:#fff; color:#222; border-top:5px solid var(--c,#999); padding:5px 4px 6px; text-align:center; position:relative; min-width:0; cursor:pointer}
+  .pf-bx{background:#fff; color:#222; border-top:5px solid var(--c,#999); padding:5px 4px 6px; text-align:center; position:relative; min-width:0; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,.12)}
   .pf-bx:hover{outline:3px solid #d9433a; outline-offset:-2px}
-  .pf-bx b{display:block; font-size:17px; font-weight:900; line-height:1} .pf-bx img, .pf-bx .pf-sf{width:100%; height:46px; object-fit:contain; margin:3px 0}
+  .pf-bx b{display:block; font-size:17px; font-weight:900; line-height:1} .pf-bx img, .pf-bx .pf-sf{width:100%; height:56px; object-fit:contain; margin:3px 0; filter:brightness(1.06) contrast(1.05)}
   .pf-bx span{display:block; font-size:11px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .pf-bx i{display:block; font-style:normal; font-size:11px; font-weight:800; color:#2e8b57; margin-top:1px; white-space:nowrap} .pf-bx i.sp{color:#c0392b; font-weight:700; font-size:10px}
-  .pf-bx.sem{opacity:.6} .pf-bx-v{background:#555; color:#aaa; border-top-color:#555; cursor:default} .pf-bx-v:hover{outline:0}
+  .pf-bx.sem::after{content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 12px 12px 0; border-color:transparent #d9433a transparent transparent} .pf-bx-v{background:#eceef0; color:#aaa; border-top-color:#c4c8cc; cursor:default; box-shadow:none} .pf-bx-v:hover{outline:0}
   .pf-leg{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; font-size:12.5px} .pf-leg i{display:inline-block; width:12px; height:12px; margin-right:5px; vertical-align:-1px}
-  .pf-leg-s i{background:#fff; opacity:.6; border:1px solid #999}
+  .pf-leg-s i{width:0 !important; height:0 !important; border-style:solid; border-width:0 11px 11px 0; border-color:transparent #d9433a transparent transparent; background:none !important; opacity:1 !important}
   .pf-exp-tabs small{font-weight:500; opacity:.8}
   .pf-cat-q{flex:1; min-width:220px}
   .pf-cat{display:grid; grid-template-columns:280px minmax(0,1fr); gap:18px}
@@ -3494,7 +3494,7 @@ function rmPfRenderExpositor(){
   el.innerHTML = `<div class="pf-h"><h1 class="rm-title">Expositor</h1><span class="pf-sub-t">igual ao expositor da loja: clique na caixinha para vender</span></div>
     <div class="pf-exp-tabs">${Array.from({ length: n }, (_, i) => { const a = i * RM_PF_POR_EXPOSITOR + 1; return `<button type="button" class="${i + 1 === rmPfExp ? 'on' : ''}" onclick="rmPfExp=${i + 1}; rmPfRenderExpositor()"><span class="pf-xl">Expositor </span>${i + 1}<small> · ${a}–${Math.min(a + RM_PF_POR_EXPOSITOR - 1, Math.max(max, a))}</small></button>`; }).join('')}</div>
     <div class="pf-exp">${caixas}</div>
-    <div class="pf-leg">${cats.filter(c => naTela.has(c)).map(c => `<span><i style="background:${rmPfCor(c)}"></i>${rmEscapeHtml(c || 'Sem categoria')}</span>`).join('')}<span class="pf-leg-s"><i></i>caixinha apagada = sem estoque</span></div>`;
+    <div class="pf-leg">${cats.filter(c => naTela.has(c)).map(c => `<span><i style="background:${rmPfCor(c)}"></i>${rmEscapeHtml(c || 'Sem categoria')}</span>`).join('')}<span class="pf-leg-s"><i></i>cantinho vermelho = sem estoque</span></div>`;
 }
 
 // ----- CATÁLOGO -----
