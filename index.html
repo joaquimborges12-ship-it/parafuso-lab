@@ -2877,23 +2877,12 @@
   }
 
 /* ===== só do laboratório ===== */
-.lab-bar{display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 16px; background:#1f2937; color:#fff; font-size:13.5px; position:sticky; top:0; z-index:50}
-.lab-bar b{font-size:15px} .lab-bar .lab-tag{background:#f2b638; color:#111; font-weight:800; border-radius:4px; padding:2px 7px; font-size:11.5px; letter-spacing:.04em}
-.lab-bar .lab-sp{flex:1} .lab-bar button,.lab-bar label{background:#374151; color:#fff; border:1px solid #4b5563; border-radius:6px; padding:6px 11px; font:inherit; font-weight:600; cursor:pointer}
-.lab-bar button:hover,.lab-bar label:hover{background:#4b5563} .lab-bar .lab-n{color:#cbd5e1}
+.lab-bar{padding:8px 16px 0} .lab-bar .lab-tag{display:inline-block; background:#f2b638; color:#111; font-weight:800; border-radius:4px; padding:2px 8px; font-size:11.5px; letter-spacing:.04em}
 #rm-app{display:block !important} #rm-app main{max-width:1400px; margin:0 auto}
 </style>
 </head>
 <body>
-<div class="lab-bar">
-  <span class="lab-tag">LABORATÓRIO</span><b>Parafusos</b>
-  <span class="lab-n" id="lab-n"></span>
-  <span class="lab-sp"></span>
-  <label title="Escolha o backup baixado em Configurações do ERP. Só LÊ o arquivo, não muda nada no ERP.">Puxar parafusos de um backup do ERP<input type="file" accept=".json,application/json" style="display:none" onchange="labImportar(this)"></label>
-  <button onclick="labBaixar()" title="Baixa os parafusos como estão aqui no laboratório">Baixar parafusos (.json)</button>
-  <button onclick="labRegistro()">Registro</button>
-  <button onclick="labZerar()">Zerar laboratório</button>
-</div>
+<div class="lab-bar"><span class="lab-tag">LABORATÓRIO</span></div>
 <div id="rm-app"><main>
 <div id="rm-section-parafusos" class="rm-section active">
       <div class="rm-subnav">
@@ -4420,7 +4409,7 @@ desenha();
 // avisos no padrão do sistema (igual ao ERP)
 window.alert = function(msg){ if(rmDlgNativo()) return rmAlertNativo(msg); rmAlerta(msg); };
 // ===== botões do laboratório =====
-function labConta(){ const n = rmLoadProdutos().filter(p => p.parafuso).length; document.getElementById('lab-n').textContent = n + ' parafuso(s) · tudo fica só neste navegador'; }
+function labConta(){ const n = rmLoadProdutos().filter(p => p.parafuso).length; const el = document.getElementById('lab-n'); if(el) el.textContent = n + ' parafuso(s)'; }
 async function labImportar(inp){
   const f = inp.files && inp.files[0]; inp.value = ''; if(!f) return;
   let d; try{ d = JSON.parse(await f.text()); }catch(e){ rmAlerta('Não consegui ler esse arquivo.'); return; }
